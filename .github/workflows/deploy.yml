@@ -5,9 +5,34 @@ on:
     branches:
       - main
 
+env:
+  IMAGE: ghcr.io/erisme/need-whey-app
+
 jobs:
-  # ── Étape 1 : bootstrap (idempotent, sans effet si déjà fait) ──────────────
-  setup:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build & push image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: ${{ env.IMAGE }}:latest
+
+  deploy:
+    needs: build-and-push
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -32,10 +57,14 @@ jobs:
           target: ${{ secrets.NAS_DIR }}
           strip_components: 0
 
-  # ── Étape 2 : build image → push GHCR → docker compose up sur le NAS ──────
-  deploy:
-    needs: setup
-    uses: Erisme/nas-deploy-templates/.github/workflows/deploy-single.yml@main
-    with:
-      image_name: "erisme/need-whey-app"
-    secrets: inherit
+      - name: Pull image & redémarrer le container
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.NAS_HOST }}
+          username: ${{ secrets.NAS_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.NAS_PORT }}
+          script: |
+            cd ${{ secrets.NAS_DIR }}
+            docker pull ${{ env.IMAGE }}:latest
+            docker compose up -d --remove-orphans
