@@ -1,0 +1,41 @@
+name: Deploy to Synology NAS
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  # ── Étape 1 : bootstrap (idempotent, sans effet si déjà fait) ──────────────
+  setup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Créer le répertoire sur le NAS
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.NAS_HOST }}
+          username: ${{ secrets.NAS_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.NAS_PORT }}
+          script: mkdir -p ${{ secrets.NAS_DIR }}
+
+      - name: Copier docker-compose.yml sur le NAS
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.NAS_HOST }}
+          username: ${{ secrets.NAS_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.NAS_PORT }}
+          source: docker-compose.yml
+          target: ${{ secrets.NAS_DIR }}
+          strip_components: 0
+
+  # ── Étape 2 : build image → push GHCR → docker compose up sur le NAS ──────
+  deploy:
+    needs: setup
+    uses: Erisme/nas-deploy-templates/.github/workflows/deploy-single.yml@main
+    with:
+      image_name: "erisme/need-whey-app"
+    secrets: inherit
