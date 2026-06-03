@@ -9,7 +9,7 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN npx prisma generate
-# Compile le seed TS → JS sans avoir besoin de tsx au runtime
+# Compile le seed TS → CJS sans tsx au runtime
 RUN npx esbuild prisma/seed.ts \
       --bundle --platform=node --format=cjs \
       --external:@prisma/client \
@@ -17,6 +17,8 @@ RUN npx esbuild prisma/seed.ts \
 RUN npm run build
 
 FROM node:20-alpine AS runner
+# OpenSSL requis par Prisma sur Alpine
+RUN apk add --no-cache openssl
 WORKDIR /app
 ENV NODE_ENV=production
 
