@@ -34,17 +34,10 @@ jobs:
   deploy:
     needs: build-and-push
     runs-on: ubuntu-latest
+    env:
+      NAS_DIR: ${{ vars.NAS_DIR }}
     steps:
       - uses: actions/checkout@v4
-
-      - name: Créer le répertoire sur le NAS
-        uses: appleboy/ssh-action@v1
-        with:
-          host: ${{ secrets.NAS_HOST }}
-          username: ${{ secrets.NAS_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: ${{ secrets.NAS_PORT }}
-          script: mkdir -p ${{ secrets.NAS_DIR }}
 
       - name: Copier docker-compose.yml sur le NAS
         uses: appleboy/scp-action@v0.1.7
@@ -55,16 +48,28 @@ jobs:
           port: ${{ secrets.NAS_PORT }}
           source: docker-compose.yml
           target: ${{ secrets.NAS_DIR }}
-          strip_components: 0
 
-      - name: Pull image & redémarrer le container
+      - name: Bootstrap + pull image + redémarrer
         uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.NAS_HOST }}
           username: ${{ secrets.NAS_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.NAS_PORT }}
+          envs: NAS_DIR,IMAGE
           script: |
-            cd ${{ secrets.NAS_DIR }}
-            docker pull ${{ env.IMAGE }}:latest
-            docker compose up -d --remove-orphans
+            mkdir -p "$NAS_DIR"
+
+            # Synology : docker n'est pas dans le PATH SSH standard
+            DOCKER=$(command -v docker 2>/dev/null \
+              || echo /var/packages/ContainerManager/target/usr/bin/docker)
+
+            cd "$NAS_DIR"
+            "$DOCKER" pull "$IMAGE:latest"
+
+            # Compose v2 (plugin) ou v1 (binaire séparé)
+            if "$DOCKER" compose version >/dev/null 2>&1; then
+              "$DOCKER" compose up -d --remove-orphans
+            else
+              docker-compose up -d --remove-orphans
+            fi
