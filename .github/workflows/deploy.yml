@@ -83,6 +83,8 @@ jobs:
             echo "AUTH_SECRET=${AUTH_SECRET}" > "$NAS_DIR/.env"
 
             cd "$NAS_DIR"
+            # Forcer accès anonyme (credentials cachés et expirés bloquent le pull public)
+            "$DOCKER" logout ghcr.io 2>/dev/null || true
             "$DOCKER" pull "$IMAGE:latest"
 
             if "$DOCKER" compose version >/dev/null 2>&1; then
