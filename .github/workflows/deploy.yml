@@ -51,14 +51,19 @@ jobs:
 
       - name: Bootstrap + pull image + redémarrer
         uses: appleboy/ssh-action@v1
+        env:
+          AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
         with:
           host: ${{ secrets.NAS_HOST }}
           username: ${{ secrets.NAS_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.NAS_PORT }}
-          envs: NAS_DIR,IMAGE
+          envs: NAS_DIR,IMAGE,AUTH_SECRET
           script: |
             mkdir -p "$NAS_DIR"
+
+            # Écrire le .env sur le NAS (AUTH_SECRET injecté depuis GitHub Secrets)
+            echo "AUTH_SECRET=${AUTH_SECRET}" > "$NAS_DIR/.env"
 
             # Synology : docker n'est pas dans le PATH SSH standard
             DOCKER=$(command -v docker 2>/dev/null \

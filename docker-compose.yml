@@ -1,17 +1,21 @@
 services:
-
-  # ── App + API dans un seul container ──────────────────────────────────────
   app:
     image: ghcr.io/erisme/need-whey-app:latest
     container_name: need-whey
     ports:
-      - "8003:80"
+      - "8003:3000"
     environment:
-      PORT: 3002
-      ALLOWED_ORIGIN: "${ALLOWED_ORIGIN:-http://localhost:5173}"
+      DATABASE_URL: "file:/app/data/prod.db"
+      AUTH_SECRET: "${AUTH_SECRET}"
     volumes:
-      - need-whey:/app/api/data
+      - need-whey-db:/app/data
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
 volumes:
-  need-whey:
+  need-whey-db:
+    name: need-whey-db
