@@ -41,23 +41,18 @@ jobs:
           NAS_DIR: ${{ vars.NAS_DIR }}
           AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
           IMAGE: ${{ env.IMAGE }}
-          GHCR_USER: ${{ github.repository_owner }}
-          GHCR_PAT: ${{ secrets.GHCR_PAT }}
         with:
           host: ${{ secrets.NAS_HOST }}
           username: ${{ secrets.NAS_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.NAS_PORT }}
-          envs: NAS_DIR,AUTH_SECRET,IMAGE,GHCR_USER,GHCR_PAT
+          envs: NAS_DIR,AUTH_SECRET,IMAGE
           script: |
             set -e
             mkdir -p "$NAS_DIR"
 
             DOCKER=$(command -v docker 2>/dev/null \
               || echo /var/packages/ContainerManager/target/usr/bin/docker)
-
-            # Authentification GHCR pour puller l'image privée
-            echo "$GHCR_PAT" | "$DOCKER" login ghcr.io -u "$GHCR_USER" --password-stdin
 
             # Écrire docker-compose.yml directement (pas de SCP)
             cat > "$NAS_DIR/docker-compose.yml" << 'COMPOSE'
