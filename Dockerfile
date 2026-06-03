@@ -17,8 +17,8 @@ RUN npx esbuild prisma/seed.ts \
 RUN npm run build
 
 FROM node:20-alpine AS runner
-# OpenSSL requis par Prisma sur Alpine
-RUN apk add --no-cache openssl
+# sqlite3 CLI pour init DB + openssl pour Prisma client
+RUN apk add --no-cache openssl sqlite
 WORKDIR /app
 ENV NODE_ENV=production
 
@@ -26,11 +26,12 @@ ENV NODE_ENV=production
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 
-# Prisma : client natif + CLI + schema + seed compilé
+# Prisma client (query engine) — pas besoin du CLI ni du schema-engine
 COPY --from=builder /app/node_modules/.prisma  ./node_modules/.prisma
 COPY --from=builder /app/node_modules/@prisma  ./node_modules/@prisma
-COPY --from=builder /app/node_modules/prisma   ./node_modules/prisma
-COPY --from=builder /app/prisma                ./prisma
+# Schema SQL + seed compilé
+COPY --from=builder /app/prisma/init.sql       ./prisma/init.sql
+COPY --from=builder /app/prisma/seed.cjs       ./prisma/seed.cjs
 
 COPY docker-entrypoint.sh ./
 RUN chmod +x docker-entrypoint.sh
