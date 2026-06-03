@@ -1,29 +1,40 @@
-## Étape 1 — Build React
-FROM node:20-alpine AS build-front
+FROM node:20-alpine AS deps
+RUN apk add --no-cache libc6-compat
 WORKDIR /app
 COPY package*.json ./
-RUN NODE_ENV=development npm install
+RUN npm ci
+
+FROM node:20-alpine AS builder
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+RUN npx prisma generate
+# Compile le seed TS → JS sans avoir besoin de tsx au runtime
+RUN npx esbuild prisma/seed.ts \
+      --bundle --platform=node --format=cjs \
+      --external:@prisma/client \
+      --outfile=prisma/seed.cjs
 RUN npm run build
 
-## Étape 2 — Image finale : nginx + API Node.js dans le même container
-FROM node:20-alpine
-RUN apk add --no-cache nginx
+FROM node:20-alpine AS runner
+WORKDIR /app
+ENV NODE_ENV=production
 
-# ── API ──────────────────────────────────────────────────────────────────────
-WORKDIR /app/api
-COPY server/package*.json ./
-RUN npm install --production --silent
-COPY server/index.js .
-RUN mkdir -p data
+# Next.js standalone
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
 
-# ── Front ────────────────────────────────────────────────────────────────────
-COPY --from=build-front /app/dist /usr/share/nginx/html
-COPY nginx.conf /etc/nginx/http.d/default.conf
+# Prisma : client natif + CLI + schema + seed compilé
+COPY --from=builder /app/node_modules/.prisma  ./node_modules/.prisma
+COPY --from=builder /app/node_modules/@prisma  ./node_modules/@prisma
+COPY --from=builder /app/node_modules/prisma   ./node_modules/prisma
+COPY --from=builder /app/prisma                ./prisma
 
-# ── Démarrage ─────────────────────────────────────────────────────────────────
-COPY start.sh /start.sh
-RUN chmod +x /start.sh
+COPY docker-entrypoint.sh ./
+RUN chmod +x docker-entrypoint.sh
 
-EXPOSE 80
-CMD ["/start.sh"]
+EXPOSE 3000
+ENV PORT=3000
+ENV HOSTNAME=0.0.0.0
+
+CMD ["./docker-entrypoint.sh"]
