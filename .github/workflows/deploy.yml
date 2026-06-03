@@ -34,44 +34,49 @@ jobs:
   deploy:
     needs: build-and-push
     runs-on: ubuntu-latest
-    env:
-      NAS_DIR: ${{ vars.NAS_DIR }}
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Créer le répertoire sur le NAS
-        uses: appleboy/ssh-action@v1
-        with:
-          host: ${{ secrets.NAS_HOST }}
-          username: ${{ secrets.NAS_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: ${{ secrets.NAS_PORT }}
-          script: mkdir -p "${{ vars.NAS_DIR }}"
-
-      - name: Copier docker-compose.yml sur le NAS
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.NAS_HOST }}
-          username: ${{ secrets.NAS_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: ${{ secrets.NAS_PORT }}
-          source: docker-compose.yml
-          target: ${{ secrets.NAS_DIR }}
-
-      - name: Bootstrap + pull image + redémarrer
+      - name: Bootstrap + déploiement
         uses: appleboy/ssh-action@v1
         env:
+          NAS_DIR: ${{ vars.NAS_DIR }}
           AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
+          IMAGE: ${{ env.IMAGE }}
         with:
           host: ${{ secrets.NAS_HOST }}
           username: ${{ secrets.NAS_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.NAS_PORT }}
-          envs: NAS_DIR,IMAGE,AUTH_SECRET
+          envs: NAS_DIR,AUTH_SECRET,IMAGE
           script: |
+            set -e
             mkdir -p "$NAS_DIR"
 
-            # Écrire le .env sur le NAS (AUTH_SECRET injecté depuis GitHub Secrets)
+            # Écrire docker-compose.yml directement (pas de SCP)
+            cat > "$NAS_DIR/docker-compose.yml" << 'COMPOSE'
+            services:
+              app:
+                image: ghcr.io/erisme/need-whey-app:latest
+                container_name: need-whey
+                ports:
+                  - "8003:3000"
+                environment:
+                  DATABASE_URL: "file:/app/data/prod.db"
+                  AUTH_SECRET: "${AUTH_SECRET}"
+                volumes:
+                  - need-whey-db:/app/data
+                restart: unless-stopped
+                healthcheck:
+                  test: ["CMD", "wget", "-qO-", "http://localhost:3000/"]
+                  interval: 30s
+                  timeout: 10s
+                  retries: 3
+
+            volumes:
+              need-whey-db:
+                name: need-whey-db
+            COMPOSE
+
+            # Écrire le .env avec le secret
             echo "AUTH_SECRET=${AUTH_SECRET}" > "$NAS_DIR/.env"
 
             # Synology : docker n'est pas dans le PATH SSH standard
@@ -81,7 +86,6 @@ jobs:
             cd "$NAS_DIR"
             "$DOCKER" pull "$IMAGE:latest"
 
-            # Compose v2 (plugin) ou v1 (binaire séparé)
             if "$DOCKER" compose version >/dev/null 2>&1; then
               "$DOCKER" compose up -d --remove-orphans
             else
