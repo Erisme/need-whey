@@ -39,6 +39,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Créer le répertoire sur le NAS
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.NAS_HOST }}
+          username: ${{ secrets.NAS_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.NAS_PORT }}
+          script: mkdir -p "${{ vars.NAS_DIR }}"
+
       - name: Copier docker-compose.yml sur le NAS
         uses: appleboy/scp-action@v0.1.7
         with:
