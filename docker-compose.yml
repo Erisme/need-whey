@@ -1,0 +1,17 @@
+services:
+
+  # ── App + API dans un seul container ──────────────────────────────────────
+  app:
+    image: ghcr.io/erisme/need-whey-app:latest
+    container_name: need-whey
+    ports:
+      - "8003:80"
+    environment:
+      PORT: 3002
+      ALLOWED_ORIGIN: "${ALLOWED_ORIGIN:-http://localhost:5173}"
+    volumes:
+      - need-whey:/app/api/data
+    restart: unless-stopped
+
+volumes:
+  need-whey:

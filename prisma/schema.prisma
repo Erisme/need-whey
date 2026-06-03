@@ -1,0 +1,56 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           Int          @id @default(autoincrement())
+  name         String
+  email        String       @unique
+  passwordHash String
+  createdAt    DateTime     @default(now())
+  profile      Profile?
+  mealEntries  MealEntry[]
+}
+
+model Profile {
+  id             Int      @id @default(autoincrement())
+  userId         Int      @unique
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sexe           String   // "homme" | "femme"
+  dateNaissance  DateTime
+  taille         Float    // cm
+  poids          Float    // kg
+  niveauActivite String   // "sedentaire" | "leger" | "modere" | "actif" | "tres_actif"
+  objectif       String   // "PERTE_POIDS" | "MAINTIEN" | "MUSCULATION"
+  vegetarien     Boolean  @default(false)
+  updatedAt      DateTime @updatedAt
+}
+
+model Food {
+  id          Int         @id @default(autoincrement())
+  nom         String
+  categorie   String
+  kcalPer100g Float
+  protPer100g Float
+  glucPer100g Float
+  lipPer100g  Float
+  vegetarien  Boolean     @default(false)
+  mealEntries MealEntry[]
+}
+
+model MealEntry {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  foodId    Int
+  food      Food     @relation(fields: [foodId], references: [id])
+  date      DateTime // stocker la date sans heure (ou normaliser à minuit UTC)
+  moment    String   // "matin" | "midi" | "soir" | "collation"
+  quantite  Float    // grammes
+  createdAt DateTime @default(now())
+}
