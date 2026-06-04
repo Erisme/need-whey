@@ -25,6 +25,8 @@ ENV NODE_ENV=production
 # Next.js standalone
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
+# Fichiers statiques publics (logo, favicon…) — non inclus dans standalone
+COPY --from=builder /app/public ./public
 
 # Prisma client (query engine) — pas besoin du CLI ni du schema-engine
 COPY --from=builder /app/node_modules/.prisma  ./node_modules/.prisma
