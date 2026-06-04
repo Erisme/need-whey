@@ -58,10 +58,24 @@ export default async function DashboardPage() {
 
   return (
     <div className="container" style={{ paddingTop: '1.5rem' }}>
-      <h1 style={{ marginBottom: '0.25rem' }}>Tableau de bord</h1>
-      <p style={{ color: 'var(--color-muted)', marginTop: 0 }}>
-        {new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })}
-      </p>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "1rem" }}>
+        <div>
+          <h1 style={{ marginBottom: "0.25rem" }}>Tableau de bord</h1>
+          <p style={{ color: "var(--color-muted)", marginTop: 0 }}>
+            {new Date().toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" })}
+          </p>
+        </div>
+        <Link 
+          href="/explications" 
+          style={{ 
+            fontSize: "0.85rem", 
+            textDecoration: "underline",
+            marginTop: "0.5rem"
+          }}
+        >
+          Comment sont calculés mes besoins ?
+        </Link>
+      </div>
 
       {besoins.alerteProteinesElevees && (
         <div className="alert alert-warning" role="alert">
