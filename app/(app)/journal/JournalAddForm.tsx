@@ -50,7 +50,7 @@ export default function JournalAddForm() {
       } finally {
         setSearching(false)
       }
-    }, 300)
+    }, 400)
     return () => clearTimeout(timer)
   }, [query])
 
