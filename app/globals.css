@@ -91,21 +91,202 @@ a { color: var(--color-primary); }
 .progress-bar-fill.success { background: var(--color-success); }
 .progress-bar-fill.danger { background: var(--color-danger); }
 
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 nav.app-nav {
   background: var(--color-surface);
   border-bottom: 1px solid var(--color-border);
+  max-width: 100%;
+}
+
+.app-nav-bar {
+  display: none;
+}
+
+.app-nav-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  color: var(--color-text);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.app-nav-toggle:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.app-nav-toggle-icon,
+.app-nav-toggle-icon::before,
+.app-nav-toggle-icon::after {
+  display: block;
+  width: 1.25rem;
+  height: 2px;
+  background: currentColor;
+  border-radius: 1px;
+  transition: transform 0.2s, opacity 0.2s;
+}
+.app-nav-toggle-icon {
+  position: relative;
+}
+.app-nav-toggle-icon::before,
+.app-nav-toggle-icon::after {
+  content: '';
+  position: absolute;
+  left: 0;
+}
+.app-nav-toggle-icon::before { top: -6px; }
+.app-nav-toggle-icon::after { top: 6px; }
+
+nav.app-nav.is-open .app-nav-toggle-icon {
+  background: transparent;
+}
+nav.app-nav.is-open .app-nav-toggle-icon::before {
+  top: 0;
+  transform: rotate(45deg);
+}
+nav.app-nav.is-open .app-nav-toggle-icon::after {
+  top: 0;
+  transform: rotate(-45deg);
+}
+
+.app-nav-menu {
   display: flex;
   gap: 1.5rem;
   padding: 0.75rem 1.5rem;
   align-items: center;
+  max-width: 100%;
 }
+
+.app-nav-links {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+  min-width: 0;
+}
+
 nav.app-nav a {
   text-decoration: none;
   color: var(--color-text);
   font-weight: 500;
+  white-space: nowrap;
 }
 nav.app-nav a:hover { color: var(--color-primary); }
-nav.app-nav .nav-spacer { flex: 1; }
+nav.app-nav .nav-spacer { flex: 1; min-width: 0; }
+
+.app-nav-account {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-shrink: 0;
+  min-width: 0;
+}
+
+.app-nav-user {
+  font-size: 0.9rem;
+  color: var(--color-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 12rem;
+}
+
+.app-nav-logout {
+  padding: 0.35rem 0.9rem;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+  .app-nav-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.75rem max(1rem, env(safe-area-inset-right)) 0.75rem max(1rem, env(safe-area-inset-left));
+    border-bottom: 1px solid transparent;
+  }
+
+  nav.app-nav.is-open .app-nav-bar {
+    border-bottom-color: var(--color-border);
+  }
+
+  .app-nav-brand {
+    font-weight: 600;
+    font-size: 1rem;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .app-nav-toggle {
+    display: flex;
+  }
+
+  .app-nav-menu {
+    display: none;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    padding: 0 max(1rem, env(safe-area-inset-right)) max(1rem, env(safe-area-inset-bottom)) max(1rem, env(safe-area-inset-left));
+  }
+
+  nav.app-nav.is-open .app-nav-menu {
+    display: flex;
+  }
+
+  .app-nav-links {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    width: 100%;
+  }
+
+  nav.app-nav a {
+    white-space: normal;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  nav.app-nav .nav-spacer {
+    display: none;
+  }
+
+  .app-nav-account {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+    width: 100%;
+    padding-top: 0.75rem;
+  }
+
+  .app-nav-user {
+    max-width: none;
+    text-align: center;
+  }
+
+  .app-nav-logout {
+    width: 100%;
+    text-align: center;
+  }
+}
 
 .alert {
   padding: 0.75rem 1rem;
