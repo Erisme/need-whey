@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { getSession } from '@/lib/auth'
 import AppNav from '@/components/AppNav'
+import AppFooter from '@/components/AppFooter'
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const session = await getSession()
@@ -10,6 +11,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     <>
       <AppNav userName={session.userName ?? ''} />
       <main>{children}</main>
+      <AppFooter />
     </>
   )
 }

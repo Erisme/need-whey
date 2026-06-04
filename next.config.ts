@@ -1,4 +1,5 @@
 import type { NextConfig } from 'next'
+import pkg from './package.json'
 
 // Identifiant unique à chaque build — utilisé pour vider le cache navigateur
 const BUILD_ID = Date.now().toString(36)
@@ -9,6 +10,7 @@ const nextConfig: NextConfig = {
   // Exposé côté client pour versionner les assets statiques (/logo.svg, /favicon.svg)
   env: {
     NEXT_PUBLIC_BUILD_ID: BUILD_ID,
+    NEXT_PUBLIC_APP_VERSION: pkg.version,
   },
 
   async headers() {
