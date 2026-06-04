@@ -30,6 +30,7 @@ jobs:
           context: .
           push: true
           tags: ${{ env.IMAGE }}:latest
+          provenance: false
 
   deploy:
     needs: build-and-push
