@@ -215,8 +215,13 @@ export default function JournalAddForm() {
                     {food.vegetarien && <span className="chip veg" style={{ marginLeft: '0.4rem' }}>veg</span>}
                     {food.fromOFF && <span style={{ marginLeft: '0.4rem', fontSize: '0.72em', color: '#888' }}>OFF</span>}
                   </span>
-                  <span style={{ fontSize: '0.82em', color: 'var(--color-text-muted, #888)', whiteSpace: 'nowrap', marginLeft: '1rem' }}>
-                    {food.protPer100g}g prot · {Math.round(food.kcalPer100g)} kcal/100g
+                  <span style={{ fontSize: '0.82em', color: 'var(--color-text-muted, #888)', whiteSpace: 'nowrap', marginLeft: '1rem', textAlign: 'right' }}>
+                    <span style={{ display: 'block', fontWeight: 600, color: 'var(--color-text, #111)', fontSize: '0.9em' }}>
+                      ~{food.poidsUnitaire} g
+                    </span>
+                    <span style={{ display: 'block' }}>
+                      {food.protPer100g}g prot · {Math.round(food.kcalPer100g)} kcal/100g
+                    </span>
                   </span>
                 </li>
               ))}
@@ -235,7 +240,7 @@ export default function JournalAddForm() {
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', paddingTop: '0.4rem' }}>
                 <strong>{quantite} g</strong>
                 <span style={{ color: 'var(--color-text-muted, #888)', fontSize: '0.85em' }}>
-                  (portion estimée)
+                  poids estimé d&apos;une portion
                 </span>
                 <button
                   type="button"
