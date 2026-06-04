@@ -24,14 +24,15 @@ CREATE TABLE IF NOT EXISTS "Profile" (
 CREATE UNIQUE INDEX IF NOT EXISTS "Profile_userId_key" ON "Profile"("userId");
 
 CREATE TABLE IF NOT EXISTS "Food" (
-  "id"          INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-  "nom"         TEXT    NOT NULL,
-  "categorie"   TEXT    NOT NULL,
-  "kcalPer100g" REAL    NOT NULL,
-  "protPer100g" REAL    NOT NULL,
-  "glucPer100g" REAL    NOT NULL,
-  "lipPer100g"  REAL    NOT NULL,
-  "vegetarien"  BOOLEAN NOT NULL DEFAULT 0
+  "id"             INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  "nom"            TEXT    NOT NULL,
+  "categorie"      TEXT    NOT NULL,
+  "kcalPer100g"    REAL    NOT NULL,
+  "protPer100g"    REAL    NOT NULL,
+  "glucPer100g"    REAL    NOT NULL,
+  "lipPer100g"     REAL    NOT NULL,
+  "vegetarien"     BOOLEAN NOT NULL DEFAULT 0,
+  "poidsUnitaire"  REAL    NOT NULL DEFAULT 100
 );
 
 CREATE TABLE IF NOT EXISTS "MealEntry" (

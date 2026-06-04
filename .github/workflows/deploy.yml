@@ -94,3 +94,6 @@ jobs:
             else
               docker-compose up -d --remove-orphans
             fi
+
+            # Supprime les anciennes images non utilisées (dangling)
+            "$DOCKER" image prune -f

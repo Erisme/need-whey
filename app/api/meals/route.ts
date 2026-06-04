@@ -17,20 +17,15 @@ export async function POST(req: NextRequest) {
 
   const { foodId, moment, quantite } = await req.json()
 
-  if (!foodId || !moment || !quantite) {
+  if (!foodId || !quantite) {
     return NextResponse.json({ error: 'Champs manquants' }, { status: 400 })
-  }
-
-  const MOMENTS = ['matin', 'midi', 'soir', 'collation']
-  if (!MOMENTS.includes(moment)) {
-    return NextResponse.json({ error: 'Moment invalide' }, { status: 400 })
   }
 
   const entry = await prisma.mealEntry.create({
     data: {
       userId: session.userId!,
       foodId: Number(foodId),
-      moment,
+      moment: moment ?? 'jour',
       quantite: Number(quantite),
       date: todayUTC(),
     },

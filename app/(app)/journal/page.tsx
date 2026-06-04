@@ -5,7 +5,7 @@ import { prisma } from '@/lib/db'
 import { calculerBesoins, calculerTotaux } from '@/lib/nutrition'
 import ProgressBar from '@/components/ProgressBar'
 import JournalAddForm from './JournalAddForm'
-import JournalMoment from './JournalMoment'
+import JournalEntries from './JournalEntries'
 import RecoSection from './RecoSection'
 
 function parseDate(param: string | undefined): Date {
@@ -24,8 +24,6 @@ function toParam(date: Date): string {
 function addDays(date: Date, n: number): Date {
   return new Date(date.getTime() + n * 86_400_000)
 }
-
-const MOMENTS = ['matin', 'midi', 'soir', 'collation'] as const
 
 export default async function JournalPage({
   searchParams,
@@ -75,11 +73,6 @@ export default async function JournalPage({
   const totaux = calculerTotaux(entries)
   const pctKcal = Math.min(100, Math.round((totaux.kcal / besoins.objectifKcal) * 100))
   const pctProt = Math.min(100, Math.round((totaux.proteines / besoins.objectifProteinesG) * 100))
-
-  const entriesByMoment = MOMENTS.reduce((acc, m) => {
-    acc[m] = entries.filter((e) => e.moment === m)
-    return acc
-  }, {} as Record<string, typeof entries>)
 
   const prevParam = toParam(addDays(selectedDate, -1))
   const nextParam = toParam(addDays(selectedDate, 1))
@@ -136,7 +129,7 @@ export default async function JournalPage({
       {isToday && (
         <div className="card">
           <h2 style={{ marginTop: 0 }}>Ajouter un aliment</h2>
-          <JournalAddForm foods={foods} />
+          <JournalAddForm />
         </div>
       )}
 
@@ -146,9 +139,7 @@ export default async function JournalPage({
         </div>
       )}
 
-      {MOMENTS.map((moment) => (
-        <JournalMoment key={moment} moment={moment} entries={entriesByMoment[moment]} readOnly={!isToday} />
-      ))}
+      <JournalEntries entries={entries} readOnly={!isToday} />
 
       {/* Reco uniquement pour aujourd'hui */}
       {isToday && totaux.proteines < besoins.objectifProteinesG && (

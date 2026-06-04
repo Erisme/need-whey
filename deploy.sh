@@ -32,7 +32,8 @@ ssh -p $NAS_PORT $NAS "
   cp -r need-whey/* $NAS_DIR/ &&
   rm -rf need-whey need-whey.tar.gz &&
   cd $NAS_DIR &&
-  $DOCKER compose up -d --build --no-deps app
+  $DOCKER compose up -d --build --no-deps app &&
+  $DOCKER image prune -f
 "
 
 rm /tmp/need-whey.tar.gz

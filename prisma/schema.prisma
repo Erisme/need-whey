@@ -33,15 +33,16 @@ model Profile {
 }
 
 model Food {
-  id          Int         @id @default(autoincrement())
-  nom         String
-  categorie   String
-  kcalPer100g Float
-  protPer100g Float
-  glucPer100g Float
-  lipPer100g  Float
-  vegetarien  Boolean     @default(false)
-  mealEntries MealEntry[]
+  id             Int         @id @default(autoincrement())
+  nom            String
+  categorie      String
+  kcalPer100g    Float
+  protPer100g    Float
+  glucPer100g    Float
+  lipPer100g     Float
+  vegetarien     Boolean     @default(false)
+  poidsUnitaire  Float       @default(100) // poids moyen d'une portion typique (g)
+  mealEntries    MealEntry[]
 }
 
 model MealEntry {
