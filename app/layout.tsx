@@ -5,7 +5,7 @@ export const metadata: Metadata = {
   title: 'Need Whey — Coach Nutrition',
   description: 'Coach nutrition et sport pour la famille',
   icons: {
-    icon: [{ url: '/favicon.svg', type: 'image/svg+xml' }],
+    icon: [{ url: `/favicon.svg?v=${process.env.NEXT_PUBLIC_BUILD_ID}`, type: 'image/svg+xml' }],
   },
 }
 

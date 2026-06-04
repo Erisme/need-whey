@@ -48,7 +48,7 @@ export default function AppNav({ userName }: { userName: string }) {
       <div className="app-nav-bar">
         <Link href="/dashboard" className="app-nav-brand" aria-label="Need Whey — accueil">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo.svg" alt="Need Whey" />
+          <img src={`/logo.svg?v=${process.env.NEXT_PUBLIC_BUILD_ID}`} alt="Need Whey" />
         </Link>
         <button
           type="button"
