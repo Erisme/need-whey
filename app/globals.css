@@ -228,12 +228,16 @@ nav.app-nav .nav-spacer { flex: 1; min-width: 0; }
   }
 
   .app-nav-brand {
-    font-weight: 600;
-    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    text-decoration: none;
     min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .app-nav-brand img {
+    display: block;
+    height: 36px;
+    width: auto;
   }
 
   .app-nav-toggle {

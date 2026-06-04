@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 168 36" role="img" aria-label="Need Whey">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#3b82f6"/>
+      <stop offset="100%" stop-color="#1e40af"/>
+    </linearGradient>
+    <clipPath id="body">
+      <rect x="10" y="12" width="16" height="18" rx="3"/>
+    </clipPath>
+  </defs>
+
+  <!-- Icône : fond arrondi bleu -->
+  <rect width="36" height="36" rx="9" fill="url(#bg)"/>
+
+  <!-- Capuchon shaker -->
+  <rect x="13" y="4" width="10" height="6" rx="2.5" fill="white" opacity="0.92"/>
+
+  <!-- Transition capuchon → corps -->
+  <rect x="11" y="9.5" width="14" height="3.5" rx="1.5" fill="white" opacity="0.6"/>
+
+  <!-- Corps shaker -->
+  <rect x="10" y="12" width="16" height="18" rx="3" fill="white"/>
+
+  <!-- Vague de liquide -->
+  <g clip-path="url(#body)">
+    <path d="M10 23 Q14 20 18 23 Q22 26 26 23 L26 30 L10 30 Z"
+          fill="#2563eb" opacity="0.5"/>
+  </g>
+
+  <!-- Repère de mesure -->
+  <line x1="11.5" y1="19" x2="16" y2="19" stroke="#d1d5db" stroke-width="1" stroke-linecap="round"/>
+  <line x1="11.5" y1="22" x2="15" y2="22" stroke="#d1d5db" stroke-width="0.8" stroke-linecap="round"/>
+
+  <!-- Texte : Need -->
+  <text
+    x="46" y="18"
+    font-family="system-ui, -apple-system, 'Segoe UI', sans-serif"
+    font-size="13"
+    font-weight="400"
+    fill="#6b7280"
+    letter-spacing="0.02em"
+  >Need</text>
+
+  <!-- Texte : Whey -->
+  <text
+    x="46" y="32"
+    font-family="system-ui, -apple-system, 'Segoe UI', sans-serif"
+    font-size="17"
+    font-weight="700"
+    fill="#1e40af"
+    letter-spacing="-0.01em"
+  >Whey</text>
+</svg>
